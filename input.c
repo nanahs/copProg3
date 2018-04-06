@@ -12,8 +12,14 @@ static int s_open(struct inode *, struct file *);
 static int s_close(struct inode *, struct file *);
 static ssize_t s_read(struct file *, char *, size_t, loff_t *);
 
+extern struct mutex FIFO_mutex;
+
+static int majorNum;
+static char buff[100] = {0};
+static int readLoc = 0;
+
 //Setting the file operations structure to call our created functions
-static struct file_operations fops = 
+static struct file_operations fops =
 {
 	.open = s_open,
 	.release = s_close,
