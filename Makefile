@@ -8,6 +8,9 @@ clean:
 load:
 	insmod ./input.ko
 	insmod ./output.ko
+unload:
+	rmmod ./output.ko
+	rmmod ./input.ko
 view:
 	cat /proc/modules
 

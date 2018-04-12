@@ -31,8 +31,8 @@ EXPORT_SYMBOL(msg_len);
 static int s_open(struct inode *, struct file *);
 static int s_close(struct inode *, struct file *);
 static ssize_t s_write(struct file *, char *, size_t, loff_t *);
-static struct class* outDevclass = NULL;
-static struct device* outDevDevice = NULL;
+static struct class* inOutClass = NULL;
+static struct device* inOutDevice = NULL;
 
 //Setting the file operations structure to call our created functions
 static struct file_operations fops =
@@ -59,17 +59,17 @@ static int __init input_module(void)
 	majorNum = regVal;
 	printk(KERN_ALERT "Device has been registered. Major number: %d.\n", majorNum);
 
-	outDevclass = class_create(THIS_MODULE, CLASS_NAME);
-	if(IS_ERR(outDevclass)){
+	inOutClass = class_create(THIS_MODULE, CLASS_NAME);
+	if(IS_ERR(inOutClass)){
 		unregister_chrdev(majorNum, DEVICE_NAME);
 		printk(KERN_ALERT "Class registration attempt has failed.\n");
 		return -1;
 	}
 	printk(KERN_ALERT "Class has been registered.\n");
 
-	outDevDevice = device_create(outDevclass, NULL, MKDEV(majorNum, 0), NULL, DEVICE_NAME);
-	if(IS_ERR(outDevDevice)){
-		class_destroy(outDevclass);
+	inOutDevice = device_create(inOutClass, NULL, MKDEV(majorNum, 0), NULL, DEVICE_NAME);
+	if(IS_ERR(inOutDevice)){
+		class_destroy(inOutClass);
 		unregister_chrdev(majorNum, DEVICE_NAME);
 		printk(KERN_ALERT "Failed to create the device.\n");
 		return -1;
@@ -81,9 +81,13 @@ static int __init input_module(void)
 
 static void __exit cleanupin_module(void)
 {
-	//Unregister the module
-	printk(KERN_ALERT "Unregistered device %d.\n", majorNum);
+	//Clean Up before exit
+	device_destroy(inOutClass, MKDEV(majorNum, 0));
+	class_unregister(inOutClass);
+	class_destroy(inOutClass);
 	unregister_chrdev(majorNum, DEVICE_NAME);
+
+	printk(KERN_ALERT "Finished cleaning up and now exiting.\n");
 }
 
 static int s_open(struct inode *node, struct file *f)
