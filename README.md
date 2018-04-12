@@ -8,5 +8,5 @@ Run make load to insert the read and write modules
 Run make unload to remove the read and write modules
 Run make view to see currently loaded modules
 
-echo '' > /dev/inputDevice
-is for writing to the module and it can be read from using the same device name
+echo 'YOUR TEXT GOES HERE' > /dev/inputDevice
+cat /dev/outputDevice is for reading from the buffer
